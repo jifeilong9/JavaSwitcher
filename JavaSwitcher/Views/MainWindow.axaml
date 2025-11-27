@@ -1,0 +1,164 @@
+<Window xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:JavaSwitcher.ViewModels"
+    xmlns:models="using:JavaSwitcher.Models"
+    xmlns:views="using:JavaSwitcher.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
+    x:Class="JavaSwitcher.Views.MainWindow"
+    x:DataType="vm:MainWindowViewModel"
+    Icon="/Assets/avalonia-logo.ico"
+    Title="Java 版本切换工具"
+    Width="900" Height="600"
+    MinWidth="700" MinHeight="500">
+
+<Design.DataContext>
+    <vm:MainWindowViewModel/>
+</Design.DataContext>
+
+<Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 顶部: 当前激活的 Java 版本 -->
+        <Border Grid.Row="0" 
+                Background="{DynamicResource SystemAccentColor}"
+                CornerRadius="8"
+                Padding="20"
+                Margin="0,0,0,20">
+            <StackPanel>
+                <TextBlock Text="当前 JAVA_HOME" 
+                          FontSize="14" 
+                          FontWeight="SemiBold"
+                          Foreground="White"
+                          Margin="0,0,0,5"/>
+                <TextBlock Text="{Binding CurrentJavaHome}" 
+                          FontSize="16"
+                          Foreground="White"
+                          TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
+
+        <!-- 中部: Java 版本列表 -->
+        <Border Grid.Row="1" 
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+               
+                <DataGrid Grid.Row="1"
+                         ItemsSource="{Binding JavaVersions}"
+                         SelectedItem="{Binding SelectedVersion}"
+                         AutoGenerateColumns="False"
+                         IsReadOnly="True"
+                         GridLinesVisibility="Horizontal"
+                         HeadersVisibility="Column"
+                         CanUserReorderColumns="False"
+                         CanUserResizeColumns="True"
+                         CanUserSortColumns="False"
+                         RowHeight="35"
+                         MinHeight="100"
+                         x:CompileBindings="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="名称" 
+                                           Binding="{Binding Name}" 
+                                           Width="*"
+                                           MinWidth="150"/>
+                        <DataGridTextColumn Header="版本" 
+                                           Binding="{Binding Version}" 
+                                           Width="150"/>
+                        <DataGridTextColumn Header="路径" 
+                                           Binding="{Binding Path}" 
+                                           Width="2*"
+                                           MinWidth="200"/>
+                        <DataGridTemplateColumn Header="状态" Width="100">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding IsActive, Converter={x:Static views:BoolToActiveConverter.Instance}}"
+                                              FontWeight="{Binding IsActive, Converter={x:Static views:BoolToFontWeightConverter.Instance}}"
+                                              Foreground="{Binding IsActive, Converter={x:Static views:BoolToColorConverter.Instance}}"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+        <!-- 底部: 操作按钮 -->
+        <StackPanel Grid.Row="2" 
+                   Orientation="Horizontal" 
+                   HorizontalAlignment="Center"
+                   Margin="0,20,0,10"
+                   Spacing="10">
+            <Button Content="切换到此版本" 
+                   Command="{Binding SwitchJavaVersionCommand}"
+                   IsEnabled="{Binding !IsLoading}"
+                   Padding="15,8"
+                   MinWidth="120"/>
+            <Button Content="自动检测" 
+                   Command="{Binding AutoDetectJavaCommand}"
+                   IsEnabled="{Binding !IsLoading}"
+                   Padding="15,8"
+                   MinWidth="120"/>
+            <Button Content="手动添加" 
+                   Click="OnAddVersionClick"
+                   IsEnabled="{Binding !IsLoading}"
+                   Padding="15,8"
+                   MinWidth="120"/>
+            <Button Content="删除版本" 
+                   Command="{Binding RemoveJavaVersionCommand}"
+                   IsEnabled="{Binding !IsLoading}"
+                   Padding="15,8"
+                   MinWidth="120"/>
+            <Button Content="刷新" 
+                   Command="{Binding RefreshCurrentVersionCommand}"
+                   IsEnabled="{Binding !IsLoading}"
+                   Padding="15,8"
+                   MinWidth="120"/>
+        </StackPanel>
+
+        <!-- 状态栏 -->
+        <Border Grid.Row="3" 
+                Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                CornerRadius="4"
+                Padding="10,5">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" 
+                          Text="{Binding StatusMessage}" 
+                          VerticalAlignment="Center"/>
+                <ProgressBar Grid.Column="1" 
+                            IsIndeterminate="True" 
+                            IsVisible="{Binding IsLoading}"
+                            Width="100"
+                            Height="4"
+                            VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+    </Grid>
+
+    <Window.Styles>
+        <Style Selector="DataGrid">
+            <Setter Property="CanUserReorderColumns" Value="False"/>
+            <Setter Property="CanUserResizeColumns" Value="True"/>
+            <Setter Property="CanUserSortColumns" Value="False"/>
+        </Style>
+    </Window.Styles>
+</Window>
