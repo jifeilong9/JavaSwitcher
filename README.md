@@ -40,7 +40,7 @@ JavaSwitcher/
 
 ### 前置要求
 
-- [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) 或更高版本
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) 或更高版本
 - Visual Studio 2022 / JetBrains Rider / VS Code
 
 ### 克隆项目
